@@ -17,4 +17,4 @@
     1) 进入准备好的工作目录
     2) git clone https://github.com/Vizdl/linux-lib.git
     3) cd ./linux-lib/src/
-    4) docker build -t linux_vizdl:v1 .
+    4) docker build -t linux-lib:v1 .
