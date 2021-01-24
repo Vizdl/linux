@@ -41,7 +41,7 @@
 	hash_long((unsigned long)nr + (unsigned long)ns, pidhash_shift)
 static struct hlist_head *pid_hash;
 static unsigned int pidhash_shift = 4;
-struct pid init_struct_pid = INIT_STRUCT_PID;
+struct pid init_struct_pid = INIT_STRUCT_PID; /* 初始化的pid */
 
 int pid_max = PID_MAX_DEFAULT;
 

@@ -687,6 +687,14 @@ fail_nocontext:
 	return NULL;
 }
 
+/*
+函数功能 : 拷贝 当前进程的 mm_struct 给 tsk
+输入参数 :
+	clone_flags : 根据标记位去拷贝对应部分
+	tsk : 需要拷贝的新进程指针
+返回值 : 
+	拷贝结果
+*/
 static int copy_mm(unsigned long clone_flags, struct task_struct * tsk)
 {
 	struct mm_struct * mm, *oldmm;
@@ -697,7 +705,7 @@ static int copy_mm(unsigned long clone_flags, struct task_struct * tsk)
 #ifdef CONFIG_DETECT_HUNG_TASK
 	tsk->last_switch_count = tsk->nvcsw + tsk->nivcsw;
 #endif
-
+	/* 初始化 */
 	tsk->mm = NULL;
 	tsk->active_mm = NULL;
 
@@ -706,6 +714,7 @@ static int copy_mm(unsigned long clone_flags, struct task_struct * tsk)
 	 *
 	 * We need to steal a active VM for that..
 	 */
+	/* 将当前进程的 mm_struct 作为被拷贝的对象 */
 	oldmm = current->mm;
 	if (!oldmm)
 		return 0;
@@ -729,7 +738,7 @@ good_mm:
 	tsk->mm = mm;
 	tsk->active_mm = mm;
 	return 0;
-
+/* 失败的 mm_struct 拷贝处理 */
 fail_nomem:
 	return retval;
 }
@@ -951,6 +960,7 @@ static void posix_cpu_timers_init(struct task_struct *tsk)
  * parts of the process environment (as per the clone
  * flags). The actual kick-off is left to the caller.
  */
+/* 函数功能 : 拷贝 当前进程的 task_struct 并返回 */
 static struct task_struct *copy_process(unsigned long clone_flags,
 					unsigned long stack_start,
 					struct pt_regs *regs,
@@ -959,10 +969,10 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 					struct pid *pid,
 					int trace)
 {
-	int retval;
-	struct task_struct *p;
+	int retval; /* 返回值 */
+	struct task_struct *p; /* 等待拷贝的进程指针 */
 	int cgroup_callbacks_done = 0;
-
+	/* 错误的标记位搭配处理 */
 	if ((clone_flags & (CLONE_NEWNS|CLONE_FS)) == (CLONE_NEWNS|CLONE_FS))
 		return ERR_PTR(-EINVAL);
 
@@ -996,6 +1006,7 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 		goto fork_out;
 
 	retval = -ENOMEM;
+	/* 复制当前进程结构体 */
 	p = dup_task_struct(current);
 	if (!p)
 		goto fork_out;
@@ -1116,7 +1127,7 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 
 	/* Perform scheduler related setup. Assign this task to a CPU. */
 	sched_fork(p, clone_flags);
-
+	/* 适配perf性能调试工具 */
 	retval = perf_event_init_task(p);
 	if (retval)
 		goto bad_fork_cleanup_policy;
@@ -1124,6 +1135,7 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	if ((retval = audit_alloc(p)))
 		goto bad_fork_cleanup_policy;
 	/* copy all the process information */
+	/* 复制所有进程信息 */
 	if ((retval = copy_semundo(clone_flags, p)))
 		goto bad_fork_cleanup_audit;
 	if ((retval = copy_files(clone_flags, p)))
@@ -1134,7 +1146,7 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 		goto bad_fork_cleanup_fs;
 	if ((retval = copy_signal(clone_flags, p)))
 		goto bad_fork_cleanup_sighand;
-	if ((retval = copy_mm(clone_flags, p)))
+	if ((retval = copy_mm(clone_flags, p))) /* 拷贝内存管理模块,写时复刻就在于此 */
 		goto bad_fork_cleanup_signal;
 	if ((retval = copy_namespaces(clone_flags, p)))
 		goto bad_fork_cleanup_mm;
@@ -1279,8 +1291,8 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	proc_fork_connector(p);
 	cgroup_post_fork(p);
 	perf_event_fork(p);
-	return p;
-
+	return p; /* PCB拷贝正确应该从这里返回 */
+/* 各种错误处理 */
 bad_fork_free_pid:
 	if (pid != &init_struct_pid)
 		free_pid(pid);
@@ -1348,12 +1360,12 @@ struct task_struct * __cpuinit fork_idle(int cpu)
  * It copies the process, and if successful kick-starts
  * it and waits for it to finish using the VM if required.
  */
-long do_fork(unsigned long clone_flags,
-	      unsigned long stack_start,
-	      struct pt_regs *regs,
-	      unsigned long stack_size,
-	      int __user *parent_tidptr,
-	      int __user *child_tidptr)
+long do_fork(unsigned long clone_flags,	/* 需要克隆的模块 */
+	      unsigned long stack_start,	/* 栈开启地址 */
+	      struct pt_regs *regs,			/* 寄存器状态 */
+	      unsigned long stack_size,		/* 栈大小 */
+	      int __user *parent_tidptr,	/* 父线程 */
+	      int __user *child_tidptr)		/* 子线程 */
 {
 	struct task_struct *p;
 	int trace = 0;
@@ -1396,7 +1408,7 @@ long do_fork(unsigned long clone_flags,
 	 */
 	if (likely(user_mode(regs)))
 		trace = tracehook_prepare_clone(clone_flags);
-
+	/* 拷贝进程控制块(PCB) */
 	p = copy_process(clone_flags, stack_start, regs, stack_size,
 			 child_tidptr, NULL, trace);
 	/*
