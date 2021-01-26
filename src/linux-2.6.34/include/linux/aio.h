@@ -98,11 +98,11 @@ struct kiocb {
 
 	union {
 		void __user		*user;
-		struct task_struct	*tsk;
+		struct task_struct	*tsk;	/* PCB模块 */
 	} ki_obj;
 
 	__u64			ki_user_data;	/* user's data for completion */
-	loff_t			ki_pos;
+	loff_t			ki_pos;			/* 缓存区指针 */
 
 	void			*private;
 	/* State that we remember to be able to restart/retry  */

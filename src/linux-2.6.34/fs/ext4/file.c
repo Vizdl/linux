@@ -54,7 +54,12 @@ static int ext4_release_file(struct inode *inode, struct file *filp)
 
 	return 0;
 }
-
+/*
+函数功能 : ext4 文件写操作函数
+输入参数 :
+	iov : 待写入的数据
+	pos : 待写入的起始位置
+*/
 static ssize_t
 ext4_file_write(struct kiocb *iocb, const struct iovec *iov,
 		unsigned long nr_segs, loff_t pos)
@@ -87,6 +92,7 @@ static const struct vm_operations_struct ext4_file_vm_ops = {
 	.page_mkwrite   = ext4_page_mkwrite,
 };
 
+/* 文件映射到 vma 区域中 */
 static int ext4_file_mmap(struct file *file, struct vm_area_struct *vma)
 {
 	struct address_space *mapping = file->f_mapping;
@@ -99,6 +105,7 @@ static int ext4_file_mmap(struct file *file, struct vm_area_struct *vma)
 	return 0;
 }
 
+/* 打开 ext4 格式的文件 */
 static int ext4_file_open(struct inode * inode, struct file * filp)
 {
 	struct super_block *sb = inode->i_sb;

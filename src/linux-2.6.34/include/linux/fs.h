@@ -720,7 +720,7 @@ static inline int mapping_writably_mapped(struct address_space *mapping)
 
 struct posix_acl;
 #define ACL_NOT_CACHED ((void *)(-1))
-
+/* 索引节点 : 表示一个已被访问过的文件 */
 struct inode {
 	struct hlist_node	i_hash;
 	struct list_head	i_list;		/* backing dev IO list */
@@ -748,7 +748,7 @@ struct inode {
 	struct mutex		i_mutex;
 	struct rw_semaphore	i_alloc_sem;
 	const struct inode_operations	*i_op;
-	const struct file_operations	*i_fop;	/* former ->i_op->default_file_ops */
+	const struct file_operations	*i_fop;	/* former ->i_op->default_file_ops */ /* 文件操作方法操作集 */
 	struct super_block	*i_sb;
 	struct file_lock	*i_flock;
 	struct address_space	*i_mapping;
@@ -909,7 +909,7 @@ static inline int ra_has_index(struct file_ra_state *ra, pgoff_t index)
 
 #define FILE_MNT_WRITE_TAKEN	1
 #define FILE_MNT_WRITE_RELEASED	2
-
+/* 文件 : 表示已被打开的文件 */
 struct file {
 	/*
 	 * fu_list becomes invalid after file_free is called and queued via
@@ -922,7 +922,7 @@ struct file {
 	struct path		f_path;
 #define f_dentry	f_path.dentry
 #define f_vfsmnt	f_path.mnt
-	const struct file_operations	*f_op;
+	const struct file_operations	*f_op;						/* 文件操作函数集 */
 	spinlock_t		f_lock;  /* f_ep_links, f_flags, no IRQ */
 	atomic_long_t		f_count;
 	unsigned int 		f_flags;
@@ -1316,6 +1316,7 @@ extern spinlock_t sb_lock;
 
 #define sb_entry(list)  list_entry((list), struct super_block, s_list)
 #define S_BIAS (1<<30)
+/* 超级快对象 */
 struct super_block {
 	struct list_head	s_list;		/* Keep this first */
 	dev_t			s_dev;		/* search index; _not_ kdev_t */
@@ -1324,7 +1325,7 @@ struct super_block {
 	unsigned long		s_blocksize;
 	loff_t			s_maxbytes;	/* Max file size */
 	struct file_system_type	*s_type;
-	const struct super_operations	*s_op;
+	const struct super_operations	*s_op;					/* 超级块方法 */
 	const struct dquot_operations	*dq_op;
 	const struct quotactl_ops	*s_qcop;
 	const struct export_operations *s_export_op;
@@ -1341,7 +1342,7 @@ struct super_block {
 #endif
 	struct xattr_handler	**s_xattr;
 
-	struct list_head	s_inodes;	/* all inodes */
+	struct list_head	s_inodes;	/* all inodes */		/* inodes链表 */
 	struct hlist_head	s_anon;		/* anonymous dentries for (nfs) exporting */
 	struct list_head	s_files;
 	/* s_dentry_lru and s_nr_dentry_unused are protected by dcache_lock */

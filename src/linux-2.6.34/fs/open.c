@@ -1186,6 +1186,7 @@ SYSCALL_DEFINE0(vhangup)
  * the caller didn't specify O_LARGEFILE.  On 64bit systems we force
  * on this flag in sys_open.
  */
+/* 标准的打开文件函数 */
 int generic_file_open(struct inode * inode, struct file * filp)
 {
 	if (!(filp->f_flags & O_LARGEFILE) && i_size_read(inode) > MAX_NON_LFS)

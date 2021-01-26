@@ -13,7 +13,7 @@
         建议阅读书籍 : Linux内核设计与实现
     3) linux 的使用
         略
-## 如何使用 linux-lib docker 镜像?
+## 如何构建 linux-lib docker 镜像?
     1) 进入准备好的工作目录
     2) git clone https://github.com/Vizdl/linux-lib.git
     3) cd ./linux-lib/src/

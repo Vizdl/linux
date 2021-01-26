@@ -85,7 +85,7 @@ full_name_hash(const unsigned char *name, unsigned int len)
 #else
 #define DNAME_INLINE_LEN_MIN 40 /* 128 bytes */
 #endif
-
+/* 目录项对象 */
 struct dentry {
 	atomic_t d_count;
 	unsigned int d_flags;		/* protected by d_lock */
