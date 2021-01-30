@@ -568,7 +568,7 @@ typedef struct {
 
 typedef int (*read_actor_t)(read_descriptor_t *, struct page *,
 		unsigned long, unsigned long);
-
+/* address_space 操作函数集 */
 struct address_space_operations {
 	int (*writepage)(struct page *page, struct writeback_control *wbc);
 	int (*readpage)(struct file *, struct page *);
@@ -621,7 +621,7 @@ int pagecache_write_end(struct file *, struct address_space *mapping,
 
 struct backing_dev_info;
 struct address_space {
-	struct inode		*host;		/* owner: inode, block_device */
+	struct inode		*host;		/* owner: inode, block_device */	/* 这个文件的索引节点 */
 	struct radix_tree_root	page_tree;	/* radix tree of all pages */
 	spinlock_t		tree_lock;	/* and lock protecting it */
 	unsigned int		i_mmap_writable;/* count VM_SHARED mappings */
@@ -629,7 +629,7 @@ struct address_space {
 	struct list_head	i_mmap_nonlinear;/*list VM_NONLINEAR mappings */
 	spinlock_t		i_mmap_lock;	/* protect tree, count, list */
 	unsigned int		truncate_count;	/* Cover race condition with truncate */
-	unsigned long		nrpages;	/* number of total pages */
+	unsigned long		nrpages;	/* number of total pages */ /* 在地址空间中,正被使用且常驻的页面数 */
 	pgoff_t			writeback_index;/* writeback starts here */
 	const struct address_space_operations *a_ops;	/* methods */
 	unsigned long		flags;		/* error bits/gfp mask */

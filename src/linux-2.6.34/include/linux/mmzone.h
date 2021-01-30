@@ -276,7 +276,13 @@ struct zone_reclaim_stat {
 	 */
 	unsigned long		nr_saved_scan[NR_LRU_LISTS];
 };
-
+/*
+内存管理区
+	类型分类 : 
+		ZONE_DMA : 地段范围的物理内存,部分ISA(体系结构)需要通过该类型管理区地址直接访问。
+        ZONE_NORMAL : 由内核直接映射到线性地址空间的较高部分(内核空间)。
+        ZONE_HIGHMEM : 系统中预留的可用内存,不能被内核直接映射。
+ */
 struct zone {
 	/* Fields commonly accessed by the page allocator */
 
@@ -311,7 +317,7 @@ struct zone {
 	/* see spanned/present_pages for more description */
 	seqlock_t		span_seqlock;
 #endif
-	struct free_area	free_area[MAX_ORDER];
+	struct free_area	free_area[MAX_ORDER];	/* 伙伴系统用于分配物理内存的属性,这是一个链表的数组,第 i 个元素表示 该链表上的一个节点 表示空闲页面数 为 2^i */
 
 #ifndef CONFIG_SPARSEMEM
 	/*
@@ -326,6 +332,7 @@ struct zone {
 
 	/* Fields commonly accessed by the page reclaim scanner */
 	spinlock_t		lru_lock;	
+	/* 用以 LRU 页面置换算法的数据结构 */
 	struct zone_lru {
 		struct list_head list;
 	} lru[NR_LRU_LISTS];
@@ -387,7 +394,7 @@ struct zone {
 	 * primary users of these fields, and in mm/page_alloc.c
 	 * free_area_init_core() performs the initialization of them.
 	 */
-	wait_queue_head_t	* wait_table;
+	wait_queue_head_t	* wait_table;	/* 等待队列哈希表,避免惊群效应 : 多个进程对同一个管理区 进行物理页的换入和换出 */
 	unsigned long		wait_table_hash_nr_entries;
 	unsigned long		wait_table_bits;
 

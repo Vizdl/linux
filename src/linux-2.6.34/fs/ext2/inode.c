@@ -812,7 +812,7 @@ ext2_writepages(struct address_space *mapping, struct writeback_control *wbc)
 {
 	return mpage_writepages(mapping, wbc, ext2_get_block);
 }
-
+/* 对 ext2 文件系统相关的页进行操作的函数集 */
 const struct address_space_operations ext2_aops = {
 	.readpage		= ext2_readpage,
 	.readpages		= ext2_readpages,
