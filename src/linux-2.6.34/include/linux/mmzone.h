@@ -55,7 +55,7 @@ static inline int get_pageblock_migratetype(struct page *page)
 }
 
 struct free_area {
-	struct list_head	free_list[MIGRATE_TYPES];
+	struct list_head	free_list[MIGRATE_TYPES]; /* MIGRATE_TYPES : 迁移类型 */
 	unsigned long		nr_free;
 };
 

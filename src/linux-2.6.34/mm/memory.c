@@ -3066,6 +3066,10 @@ static inline int handle_pte_fault(struct mm_struct *mm,
 					return do_linear_fault(mm, vma, address,
 						pte, pmd, flags, entry);
 			}
+			/*
+			1) pte_none(entry) 发生缺页的地址所在页表项不存在。
+			2) 是匿名页发生的,即是vma->vm_ops为空。
+			*/
 			return do_anonymous_page(mm, vma, address,
 						 pte, pmd, flags);
 		}
