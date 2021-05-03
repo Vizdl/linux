@@ -3,6 +3,7 @@ docker build -t linux-lib:latest Docker
 运行容器
 docker run \
 --rm \
+-w /workdir \
 --volume=$PWD/src:/workdir:rw \
 -it linux-lib:latest \
 /bin/bash
